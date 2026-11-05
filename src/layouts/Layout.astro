@@ -1,0 +1,152 @@
+---
+
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <slot name="head" />
+    <title>Astro and Leaflet</title>
+  </head>
+  <body>
+    <header><h1>Astro and Leaflet</h1></header>
+    <main><slot /></main>
+    <footer>
+      <p>
+        <a href="/">Examples</a> are from <a href="https://cs12.net/"
+          >CSCI E-12</a
+        >, <a href="https://extension.harvard.edu/">Harvard Extension School</a>
+      </p>
+      <p>National Park data is from the <a href="http://www.nps.gov/">National Park Service</a> and their <a href="https://www.nps.gov/subjects/developer/index.htm">NPS Data API</a>. </p>
+    </footer></body>
+</html>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+  }
+
+  body {
+    padding: 1rem;
+    font-family: helvetica, sans-serif;
+  }
+
+  h1 {
+    margin-top: 0;
+  }
+
+  main ul li {
+    margin-bottom: 0.5rem;
+  }
+  #map {
+    height: 70vh;
+    width: 100%;
+  }
+
+  img.nhl-central {
+    filter: hue-rotate(60deg);
+  }
+
+  img.nhl-pacific {
+    filter: hue-rotate(120deg);
+  }
+
+  img.nhl-metropolitan {
+    filter: hue-rotate(180deg);
+  }
+
+  img.mlb-al-east {
+    filter: hue-rotate(120deg);
+  }
+
+  img.mlb-al-central {
+    filter: hue-rotate(150deg);
+  }
+
+  img.mlb-al-west {
+    filter: hue-rotate(180deg);
+  }
+
+  img.mlb-nl-east {
+    filter: hue-rotate(0deg);
+  }
+
+  img.mlb-nl-central {
+    filter: hue-rotate(30deg);
+  }
+
+  img.mlb-nl-west {
+    filter: hue-rotate(60deg);
+  }
+
+  img.nba-west,
+  img.mls-western-conference {
+    filter: hue-rotate(240deg);
+  }
+
+  img.nba-east,
+  img.mls-eastern-conference {
+    /* default */
+    filter: none;
+  }
+
+  img.nfl-afc-north {
+    filter: hue-rotate(0deg);
+  }
+
+  img.nfl-afc-south {
+    filter: hue-rotate(20deg);
+  }
+
+  img.nfl-afc-east {
+    filter: hue-rotate(40deg);
+  }
+
+  img.nfl-afc-west {
+    filter: hue-rotate(60deg);
+  }
+
+  img.nfl-nfc-north {
+    filter: hue-rotate(120deg);
+  }
+
+  img.nfl-nfc-south {
+    filter: hue-rotate(140deg);
+  }
+
+  img.nfl-nfc-east {
+    filter: hue-rotate(160deg);
+  }
+
+  img.nfl-nfc-west {
+    filter: hue-rotate(180deg);
+  }
+
+  a,
+  a:link,
+  a:visited,
+  a:hover,
+  a:active {
+    color: blue;
+    text-decoration: none;
+  }
+
+  a:hover,
+  a:active {
+    text-decoration: underline;
+  }
+
+  footer {
+    margin-top: 1rem;
+    border-top: 2px solid darkgray;
+  }
+
+  form {
+    margin-bottom: 2rem;
+  }
+</style>

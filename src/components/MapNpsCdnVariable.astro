@@ -1,0 +1,57 @@
+---
+// Same as MapNpsCdn.astro, but the data is passed as a script variable
+// (define:vars) instead of a data-* attribute.
+interface Place {
+  fullName: string;
+  latitude: number;
+  longitude: number;
+}
+interface Props {
+  places: Place[];
+}
+
+const { places = [] } = Astro.props;
+---
+
+{/* No data-* attribute here: the data goes straight into the script below. */}
+<div id="map"></div>
+
+<style>
+  #map {
+    height: 70vh;
+    width: 100%;
+  }
+</style>
+
+{/* define:vars writes `const places = [...]` at the top of this script for you,
+    so `places` is already an array: no dataset, no JSON.parse.
+    Trade-off: define:vars makes the script is:inline, so Astro doesn't process it.
+    That means plain JavaScript only (no TypeScript) and no npm imports,
+    which is why it relies on the global `L` from the CDN. */}
+<script is:inline define:vars={{ places }}>
+  const map = L.map("map");
+  map.setView([41, -71], 7); // starting view; fitBounds below replaces it
+  console.log(places);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  // One marker and popup per place.
+  places.forEach((place) => {
+    const marker = L.marker([place.latitude, place.longitude]).addTo(map);
+    marker.bindPopup(place.fullName);
+  });
+
+  // Zoom to fit every marker (skipped if the list is empty).
+  if (places.length > 0) {
+    const latitudes = places.map((place) => place.latitude);
+    const longitudes = places.map((place) => place.longitude);
+    const bounds = [
+      [Math.min(...latitudes), Math.min(...longitudes)], // Southwest corner
+      [Math.max(...latitudes), Math.max(...longitudes)], // Northeast corner
+    ];
+    map.fitBounds(bounds, { padding: [20, 20] });
+  }
+</script>

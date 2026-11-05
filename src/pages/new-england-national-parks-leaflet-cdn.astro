@@ -1,0 +1,23 @@
+---
+// Example 3: same map and data as Example 2, but Leaflet is loaded from a
+// CDN (unpkg.com) instead of being installed with npm.
+import Layout from '../layouts/Layout.astro';
+import MapNpsCdn from '../components/MapNpsCdn.astro';
+import npsData from '../data/ne-nps.json';
+const parks = npsData.data;
+---
+
+<Layout>
+    {/* slot="head" sends these tags into <head> (see <slot name="head" /> in Layout.astro).
+        is:inline tells Astro to output the <script> exactly as written, with no bundling.
+        Loading leaflet.js this way creates a global variable `L` for the component to use. */}
+    <Fragment slot="head">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    </Fragment>
+
+    <h2>New England National Parks</h2>
+
+    <MapNpsCdn places={parks}/>
+
+</Layout>

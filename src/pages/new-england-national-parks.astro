@@ -1,0 +1,17 @@
+---
+// Example 2: many points from a JSON file. Leaflet is installed with npm.
+import Layout from '../layouts/Layout.astro';
+import MapNps from '../components/MapNps.astro';
+
+// Importing JSON here happens at build time: the browser never fetches this
+// file; its contents are baked into the page's HTML.
+import npsData from '../data/ne-nps.json';
+const parks = npsData.data; // array of { fullName, latitude, longitude }
+---
+
+<Layout>
+    <h2>New England National Parks</h2>
+
+    <MapNps places={parks}/>
+
+</Layout>

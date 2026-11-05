@@ -1,0 +1,16 @@
+---
+// Home page ("/"). Every .astro file in src/pages/ becomes a route named after the file.
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+
+    {/* Suggested order: each example changes one thing from the one before it. */}
+	<ul>
+		<li><a href="harvard-yard/">Harvard Yard</a></li>
+		<li><a href="new-england-national-parks/">New England National Parks</a> - using <code>npm install leaflet</code> and passing data with <code>data-*</code> attribute with stringified JSON</li>
+		<li><a href="new-england-national-parks-leaflet-cdn/">New England National Parks</a> - using Leaflet CDN and passing data with <code>data-*</code> attribute with stringified JSON</li>
+		<li><a href="new-england-national-parks-leaflet-cdn-with-variable/">New England National Parks</a> using Leaflet CDN and passing data with <code>define:vars</code> attribute with stringified JSON</li>
+	</ul>
+
+</Layout>

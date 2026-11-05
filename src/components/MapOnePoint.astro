@@ -1,0 +1,63 @@
+---
+// Frontmatter (between the ---) runs at build time on the server, never in the browser.
+// Each prop is optional ("?") and gets a default value below.
+interface Props {
+  lat?: number;
+  lng?: number;
+  zoom?: number;
+  title?: string;
+}
+
+const { lat = 0, lng = 0, zoom = 5, title = "Zero Zero" } = Astro.props;
+---
+
+{/* Server → browser handoff: props are written into data-* attributes,
+    and the <script> below reads them back with el.dataset. */}
+<div id="map" data-lat={lat} data-lng={lng} data-zoom={zoom} data-title={title}></div>
+
+{/* Astro scopes <style> to this component. Leaflet needs an explicit height,
+    or the map is 0px tall and invisible. */}
+<style>
+  #map {
+    height: 50vh;
+    width: 100%;
+  }
+</style>
+
+{/* A plain <script> is processed by Astro: TypeScript works, npm imports are
+    bundled, and it runs in the browser. */}
+<script>
+  // npm version of Leaflet: import its CSS and JS, and Vite bundles both.
+  import "leaflet/dist/leaflet.css";
+  import L from "leaflet";
+
+  // Fix for broken marker images after `astro build`: Leaflet guesses its image
+  // folder from leaflet.css, and bundling breaks that guess. So import the images
+  // ourselves (?url = "give me the file's URL as a string") and pass them to Leaflet.
+  import iconUrl from "leaflet/dist/images/marker-icon.png?url";
+  import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png?url";
+  import shadowUrl from "leaflet/dist/images/marker-shadow.png?url";
+  L.Icon.Default.imagePath = ""; // don't guess a folder; use our URLs as-is
+  L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
+
+  // "!" tells TypeScript the element definitely exists (not null).
+  const el = document.getElementById("map")!;
+  console.log(el.dataset);
+
+  // dataset values are always strings, so convert numbers with Number().
+  const lat = Number(el.dataset.lat);
+  const lng = Number(el.dataset.lng);
+  const zoom = Number(el.dataset.zoom);
+  const title = String(el.dataset.title);
+
+  const map = L.map(el).setView([lat, lng], zoom);
+
+  // Tiles are the background map images. OpenStreetMap requires the attribution.
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  // A marker with a popup that opens on click.
+  L.marker([lat, lng]).addTo(map).bindPopup(title);
+</script>

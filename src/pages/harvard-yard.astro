@@ -1,0 +1,14 @@
+---
+// Example 1: the simplest map, one point.
+// The page only supplies the data (as props); the component does the map work.
+import Layout from '../layouts/Layout.astro';
+import MapOnePoint from '../components/MapOnePoint.astro';
+---
+
+<Layout>
+    <h2>Harvard Yard and John Harvard Statue</h2>
+
+    {/* Change these props to map a different place; no component changes needed. */}
+    <MapOnePoint lat={42.37443} lng={-71.11718} zoom={17} title={'John Harvard Statue'} />
+
+</Layout>

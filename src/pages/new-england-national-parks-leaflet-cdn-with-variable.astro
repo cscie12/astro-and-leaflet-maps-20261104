@@ -1,0 +1,22 @@
+---
+// Example 4: same as Example 3 (Leaflet from a CDN), but the data reaches the
+// browser as a JavaScript variable instead of a data-* attribute.
+// This page is identical to Example 3; the difference is inside the component.
+import Layout from '../layouts/Layout.astro';
+import MapNpsCdnVariable from '../components/MapNpsCdnVariable.astro';
+import npsData from '../data/ne-nps.json';
+const parks = npsData.data;
+---
+
+<Layout>
+    {/* Load Leaflet from the CDN into <head>; this creates the global `L`. */}
+    <Fragment slot="head">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    </Fragment>
+
+    <h2>New England National Parks</h2>
+
+    <MapNpsCdnVariable places={parks}/>
+
+</Layout>

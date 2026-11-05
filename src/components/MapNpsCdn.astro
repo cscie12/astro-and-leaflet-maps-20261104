@@ -1,0 +1,71 @@
+---
+// Same as MapNps.astro, except Leaflet comes from the CDN <script> on the page,
+// not from npm. Compare the two files: only the top of the <script> differs.
+interface Place {
+  fullName: string;
+  latitude: number;
+  longitude: number;
+}
+interface Props {
+  places: Place[];
+}
+
+const { places = [] } = Astro.props;
+---
+
+{/* Same data handoff as MapNps.astro: array → JSON string in a data-* attribute. */}
+<div id="map" data-places={JSON.stringify(places)}></div>
+
+<style>
+  #map {
+    height: 70vh;
+    width: 100%;
+  }
+</style>
+
+<script>
+  // No Leaflet imports: the CDN <script> in <head> already created a global `L`.
+  // These two lines only inform TypeScript about it (both are removed at build time):
+  import type { LatLngBoundsLiteral } from "leaflet";
+  declare const L: typeof import("leaflet");
+
+  // No marker-image fix needed: leaflet.css comes from unpkg unbundled,
+  // so Leaflet finds its images on the CDN.
+
+  // Types in the frontmatter don't reach this browser script, so declare Place again.
+  interface Place {
+    fullName: string;
+    latitude: number;
+    longitude: number;
+  }
+
+  const el = document.getElementById("map")!;
+  const map = L.map("map");
+  map.setView([41, -71], 7) // starting view; fitBounds below replaces it
+
+  // String → array. `?? "[]"` is a fallback in case the attribute is missing.
+  const places: Place[] = JSON.parse(el.dataset.places ?? "[]");
+  console.log(places);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  // One marker and popup per place.
+  places.forEach((place) => {
+    let marker = L.marker([place.latitude, place.longitude]).addTo(map);
+    marker.bindPopup(place.fullName)
+  })
+
+  // Zoom to fit every marker: the smallest and largest lat/lng make a box.
+  let latitudes = places.map((place) => place.latitude);
+  let longitudes = places.map((place) => place.longitude);
+  // LatLngBoundsLiteral is Leaflet's type for [[lat, lng], [lat, lng]]
+  // (imported by name above, since `L` here is only a declared global).
+  let bounds: LatLngBoundsLiteral = [
+    [Math.min(...latitudes), Math.min(...longitudes)], // Southwest corner
+    [Math.max(...latitudes), Math.max(...longitudes)], // Northeast corner
+  ];
+  map.fitBounds(bounds, { padding: [20, 20] })
+</script>

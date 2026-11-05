@@ -1,0 +1,74 @@
+---
+// Same pattern as MapOnePoint.astro, but the prop is an array of places.
+interface Place {
+  fullName: string;
+  latitude: number;
+  longitude: number;
+}
+interface Props {
+  places: Place[];
+}
+
+const { places = [] } = Astro.props;
+---
+
+{/* Attributes only hold strings, so JSON.stringify turns the array into one.
+    The script turns it back into an array with JSON.parse. */}
+<div id="map" data-places={JSON.stringify(places)}></div>
+
+<style>
+  #map {
+    height: 70vh;
+    width: 100%;
+  }
+</style>
+
+<script>
+  // npm version of Leaflet: import its CSS and JS, and Vite bundles both.
+  import "leaflet/dist/leaflet.css";
+  import L from "leaflet";
+
+  // Fix for broken marker images after `astro build` (same fix as MapOnePoint.astro).
+  // Leaflet guesses its image folder from leaflet.css, and bundling breaks that guess.
+  import iconUrl from "leaflet/dist/images/marker-icon.png?url";
+  import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png?url";
+  import shadowUrl from "leaflet/dist/images/marker-shadow.png?url";
+  L.Icon.Default.imagePath = ""; // don't guess a folder; use our URLs as-is
+  L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
+
+  // Types in the frontmatter don't reach this browser script, so declare Place again.
+  interface Place {
+    fullName: string;
+    latitude: number;
+    longitude: number;
+  }
+
+  const el = document.getElementById("map")!;
+  const map = L.map("map");
+  map.setView([41, -71], 7) // starting view; fitBounds below replaces it
+
+  // String → array. `?? "[]"` is a fallback in case the attribute is missing.
+  const places: Place[] = JSON.parse(el.dataset.places ?? "[]");
+  console.log(places);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  // One marker and popup per place.
+  places.forEach((place) => {
+    let marker = L.marker([place.latitude, place.longitude]).addTo(map);
+    marker.bindPopup(place.fullName)
+  })
+
+  // Zoom to fit every marker: the smallest and largest lat/lng make a box.
+  let latitudes = places.map((place) => place.latitude);
+  let longitudes = places.map((place) => place.longitude);
+  // LatLngBoundsLiteral is Leaflet's type for [[lat, lng], [lat, lng]].
+  let bounds: L.LatLngBoundsLiteral = [
+    [Math.min(...latitudes), Math.min(...longitudes)], // Southwest corner
+    [Math.max(...latitudes), Math.max(...longitudes)], // Northeast corner
+  ];
+  map.fitBounds(bounds, { padding: [20, 20] })
+</script>
